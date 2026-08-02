@@ -31,8 +31,8 @@ on any drift. Never inline a game-rule number anywhere else. Server-internal tun
   rather than guessing. Flip `decided: true` in the same commit that fills them in.
 - `LAUNCH_AT`, `CANVAS_DOMAIN` — `null` until decided.
 - `USDC_ADDRESS_STAGING` — `null`, `[VERIFY]` from Circle docs at M3.
-- W2 endianness: 04-API does not state one. This package fixes **big-endian** (network
-  byte order) for `seq`/`x`/`y`; fold that back into 04-API on the next contract pass.
+
+W2 byte order is **big-endian**, locked in 04-API "Wire formats" — not an open item.
 
 ## Commands
 

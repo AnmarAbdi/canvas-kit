@@ -6,10 +6,8 @@
  *   u16 count
  *   repeat count: { u16 x, u16 y, u8 c, u8 kind }   // kind: 0 free 1 paid 2 moderated 3 reverted
  *
- * Byte order: BIG-ENDIAN (network byte order) for the u32/u16 fields. 04-API does not
- * state an endianness; big-endian is the conventional choice for a wire protocol and
- * both the server and the kit clients read this codec, so it is fixed here and should
- * be written back into 04-API on the next contract pass.
+ * Byte order: BIG-ENDIAN (network byte order) for every multi-byte field. Locked in
+ * 04-API "Wire formats" — this codec and that doc must not disagree.
  *
  * No metadata (payer, price) rides this stream by design — hover fetches
  * /api/region?meta=1 lazily. Keeps the stream tiny under war load.

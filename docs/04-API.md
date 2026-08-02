@@ -77,6 +77,10 @@ u32 seq            // monotonically increasing, global
 u16 count
 repeat count: { u16 x, u16 y, u8 c, u8 kind }   // kind: 0 free, 1 paid, 2 moderated, 3 reverted
 ```
+Byte order: **big-endian** (network byte order) for every multi-byte field (`seq`,
+`x`, `y`). Frame length is exactly `7 + 6*count` bytes; a decoder MUST reject any
+frame whose length disagrees with the declared `count`, whose `version` it does not
+know, whose color byte is outside the palette, or whose `kind` is not 0–3.
 Metadata (payer, price) is NOT in the hot diff stream — hover fetches
 `/api/region?meta=1` lazily. Keeps the stream tiny under war load.
 
