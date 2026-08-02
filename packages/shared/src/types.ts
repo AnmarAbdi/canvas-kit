@@ -145,6 +145,8 @@ export const ErrorCode = {
   TURNSTILE_FAILED: 'TURNSTILE_FAILED',
   COOLDOWN: 'COOLDOWN',
   NOT_BLANK: 'NOT_BLANK',
+  /** Free paint into a quarantined region (08-MODERATION). Paid paint is unaffected. */
+  QUARANTINED: 'QUARANTINED',
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 

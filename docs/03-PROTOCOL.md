@@ -198,6 +198,7 @@ Consequences that follow from the above, and are required:
 | 409 | `IMMUNE` | A target pixel is inside its immunity window. Body lists offending pixels + `immune_until`s. Wait, re-diff, retry. |
 | 409 | `CAS_STALE` | Repaint index moved (someone painted first). Fresh 402 has the new price. |
 | 409 | `SETTLING` | Transient. Retry after `Retry-After`. |
+| 409 | `QUARANTINED` | Free path only: the region is paid-only (08-MODERATION). Terminal for a free client; paid paint is unaffected and priced as normal. |
 | 410 | `FROZEN` | `now >= FREEZE_AT`. Terminal forever. |
 | 429 | `RATE_LIMITED` | Per-IP limits on unpaid requests (quotes are free — protected). |
 | 502 | `SETTLEMENT_FAILED` | Write reverted, payer not charged. Safe to retry from scratch. |
