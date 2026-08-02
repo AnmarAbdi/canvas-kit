@@ -41,8 +41,15 @@ Tools:
 
 Loop: load job → `diff_job` → chunk (per tile; ≤50 px per request in contested
 regions) → paint each chunk with budget check → handle `409`s per 03-PROTOCOL §6
-(IMMUNE: sleep until `immune_until`; CAS_STALE: re-diff, accept new price or skip
-pixel if over per-pixel ceiling) → sleep → repeat until diff empty or budget spent.
+→ sleep → repeat until diff empty or budget spent.
+
+**Losing a race looks like `IMMUNE`, not `CAS_STALE`.** When somebody paints the pixel
+first, their placement also makes it immune, so that is the rejection you get: sleep
+until `immune_until`, re-diff (the pixel may now be the colour you wanted anyway), and
+re-quote — the price will have doubled, so check it against your per-pixel ceiling
+before paying. `CAS_STALE` is handled by the client for completeness but is not
+reachable while `QUOTE_TTL_MS ≤ immunity` (03-PROTOCOL §6); do not build retry logic
+that depends on seeing it.
 Every error path in 03-PROTOCOL §6 is exercised and commented — the painter doubles
 as protocol documentation.
 

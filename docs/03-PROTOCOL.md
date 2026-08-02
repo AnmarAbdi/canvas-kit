@@ -196,7 +196,7 @@ Consequences that follow from the above, and are required:
 | 413 | `TOO_MANY_PIXELS` | > `BULK_MAX_PIXELS`. Chunk. |
 | 422 | `QUOTE_EXPIRED` / `QUOTE_INVALID` / `QUOTE_CONSUMED` | Re-request (bare POST) for a fresh 402. |
 | 409 | `IMMUNE` | A target pixel is inside its immunity window. Body lists offending pixels + `immune_until`s. Wait, re-diff, retry. |
-| 409 | `CAS_STALE` | Repaint index moved (someone painted first). Fresh 402 has the new price. |
+| 409 | `CAS_STALE` | Repaint index moved (someone painted first). Fresh 402 has the new price. **In practice a client will not see this** — see the note below. |
 | 409 | `SETTLING` | Transient. Retry after `Retry-After`. |
 | 409 | `QUARANTINED` | Free path only: the region is paid-only (08-MODERATION). Terminal for a free client; paid paint is unaffected and priced as normal. |
 | 410 | `FROZEN` | `now >= FREEZE_AT`. Terminal forever. |
@@ -205,13 +205,21 @@ Consequences that follow from the above, and are required:
 
 Error bodies: `{ error: CODE, detail, pixels?: [...], retry_after_ms? }`.
 
+**`CAS_STALE` is a safety mechanism, not a client-visible outcome.** A quote lives
+`QUOTE_TTL_MS` (30s), and any placement that moves a pixel's repaint index also makes
+that pixel immune for `immunityMsAt()` (60s, or 30s in December). So a racer whose index
+went stale is still inside the winner's immunity window when it pays: it is rejected as
+`IMMUNE`, and its quote expires before immunity lifts. The CAS check stays exactly where
+it is — it is what makes lost updates impossible, and it must not depend on immunity
+being configured a particular way — but clients should be written against `IMMUNE`.
+
 ## 7. Race interleavings — the test matrix (normative)
 
 Two payers A, B; pixel P at repaint index n. Each row is a required integration test.
 
 | # | Interleaving | Required outcome |
 |---|---|---|
-| 1 | A and B both hold valid quotes for P@n; A commits first | A: committed+settled. B: CAS fails at §4.4 → `409 CAS_STALE` → fresh 402 at n+1. B's payment never settled. |
+| 1 | A and B both hold valid quotes for P@n; A commits first | A: committed+settled. B is refused and never settled. B sees `409 IMMUNE` with A's `immune_until`: A's placement made P immune, and rule 3 is checked before the CAS at rule 4. B waits out the window, re-diffs, and re-quotes at n+1. (The CAS at §4.4 is what *guarantees* B cannot overwrite A; it is simply not the rule B trips first, and with `QUOTE_TTL_MS ≤ immunity` it never can be — see §6.) |
 | 2 | A paints P; B attempts within immunity window | B → `409 IMMUNE`, not settled. |
 | 3 | A's quote expires before retry | `422 QUOTE_EXPIRED`, nothing written/settled. |
 | 4 | A replays a settled quote (`qid` reuse) | `422 QUOTE_CONSUMED`. |

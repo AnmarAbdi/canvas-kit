@@ -299,6 +299,10 @@ export class CanvasClient {
       }
       case 'CAS_STALE':
         // Someone painted first; the price moved. Re-quote from scratch.
+        //
+        // Kept for completeness, but a live server will not send this: the winner's
+        // placement also makes the pixel immune, and immunity is checked before the CAS,
+        // so the loser gets IMMUNE above (03-PROTOCOL §6). Do not rely on this branch.
         return { ...nothing, retry: pixels, waitMs: 0 };
       case 'SETTLING':
         return { ...nothing, retry: pixels, waitMs: body.retry_after_ms ?? 1_000 };
