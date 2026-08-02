@@ -55,6 +55,18 @@ Errors: `403 TURNSTILE_FAILED`, `429 COOLDOWN` (`retry_after_ms`), `409 NOT_BLAN
 (pixel was painted at any point — free tier is blank-only, no exceptions), `409 IMMUNE`,
 `410 FROZEN`. No URL field exists on this endpoint (01-CONSTANTS: locked).
 
+A fresh `turnstile_token` is required on **every** call, not once per session: tokens
+are single-use at siteverify, so the widget refreshes per placement. The session cookie
+carries the cooldown; the token carries the "still a human" claim.
+
+**Losing attempts cost nothing.** The cooldown is consumed only by a placement that
+actually commits. Any rejection — `TURNSTILE_FAILED`, `NOT_BLANK`, `IMMUNE`, `SETTLING`,
+`FROZEN` — leaves the session's cooldown exactly as it was, so a user who clicks a
+pixel someone else just took is not punished for the server's answer. This mirrors the
+paid path, where a payment that does not commit is never settled. Order of operations
+follows from it: verify Turnstile *before* claiming the cooldown slot, so junk tokens
+cannot burn a real user's window.
+
 ## Realtime
 
 ### `WS /api/live`
