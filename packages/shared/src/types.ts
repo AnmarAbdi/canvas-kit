@@ -150,9 +150,23 @@ export const ErrorCode = {
 } as const;
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
+/**
+ * A pixel named in an error body (03-PROTOCOL §6): the coordinate plus whatever the
+ * server can say about why it was refused. No colour — the offender is a position on
+ * the canvas, not a placement, and requiring `c` here forced casts at every call site.
+ */
+export interface ErrorPixel {
+  x: number;
+  y: number;
+  /** Current repaint index, on CAS_STALE. */
+  n?: number;
+  /** When the pixel becomes paintable, on IMMUNE. */
+  immune_until?: number;
+}
+
 export interface ApiError {
   error: ErrorCode;
   detail?: string;
-  pixels?: (Pixel & { n?: number; immune_until?: number })[];
+  pixels?: ErrorPixel[];
   retry_after_ms?: number;
 }
