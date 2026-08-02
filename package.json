@@ -6,8 +6,11 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @canvas2026/shared && npm run build -w @canvas2026/converter && npm run build -w @canvas2026/client && npm run build -w @canvas2026/canvas-mcp",
     "test": "vitest run",
     "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2"
   }
 }

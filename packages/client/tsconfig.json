@@ -1,15 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2022", "module": "ESNext", "moduleResolution": "bundler",
-    "lib": ["ES2022"], "strict": true, "noUncheckedIndexedAccess": true,
+    "lib": ["ES2022", "DOM"], "strict": true, "noUncheckedIndexedAccess": true,
     "declaration": true, "outDir": "dist", "rootDir": "src",
-    "verbatimModuleSyntax": true, "skipLibCheck": true, "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@canvas2026/shared": ["../shared/src/index.ts"],
-      "@canvas2026/client": ["../client/src/index.ts"],
-      "@canvas2026/converter": ["../converter/src/index.ts"]
-    }
+    "verbatimModuleSyntax": true, "skipLibCheck": true, "resolveJsonModule": true
   },
   "include": ["src"]
 }

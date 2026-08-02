@@ -147,6 +147,46 @@ The write-then-settle gap means a briefly-visible pixel can revert on settlement
 failure. This is acceptable (rare, logged, sub-minute) and strictly better than the
 alternative (settle-then-write can charge for writes that never happen — forbidden).
 
+### 5.1 Orphaned settlements (normative)
+
+A settlement is **orphaned** when the chain shows a transfer to `PAY_TO` for which no
+`receipts` row exists. It happens when the Worker dies between `/settle` returning and
+the receipt being written — client disconnect, eviction, deploy. The money moved, the
+pixel committed, the record did not.
+
+**The chain is authoritative. Orphans are reconciled by backfilling a receipt, never by
+refunding.** The payer paid and got their pixel; the only thing missing is our record of
+it, and the fix for a missing record is to write it. Refunds do not exist anywhere in
+this protocol (§0, D4) and an orphan is not the place to introduce them.
+
+A backfilled receipt is **not** a settled receipt and must never be mistaken for one:
+
+- `source = 'backfill'` (settled rows are `'settled'`). This column is the only
+  thing standing between a reconstructed row and a forged one.
+- `qid = 'backfill:<tx>'`. Deterministic, so re-running reconciliation is idempotent,
+  and prefixed so it can never collide with a real quote id.
+- `payer`, `total_units`, `tx`, `ts` come from the transfer log. These are the only
+  fields the chain proves.
+- `sig` is the literal string `'backfill:unsigned'`. A backfilled row is **never**
+  signed with `RECEIPT_SIGNING_KEY`: that key attests "the server issued this receipt
+  for these pixels", and for an orphan the server does not know which pixels those
+  were. Signing reconstructed data would make the signature meaningless everywhere.
+- `pixel_count = 0`, meaning *unknown*. The transfer proves an amount, and because
+  price doubles per repaint (§4) an amount does not decompose into a unique set of
+  pixels. It is not zero pixels; it is a count we cannot honestly state.
+
+Consequences that follow from the above, and are required:
+
+- The ledger (`/api/ledger`) sums `total_units` over all receipts including backfills —
+  the money is real, so it counts. Any per-pixel statistic must exclude
+  `source = 'backfill'` rows or it will silently read the unknown count as zero.
+- Backfilling adds **no history row**. History is per-pixel provenance and we do not
+  know the pixels; an invented row would corrupt the public log to tidy a total. The
+  pixel keeps whatever the tile DO committed, which is the truth about the canvas.
+- After a backfill, reconciliation reports `RECONCILED` on money and separately reports
+  how many rows are backfilled. A rising backfill count is an availability bug in the
+  settle path, not a bookkeeping style — it is alarmed on in 09-OPS.
+
 ## 6. Errors
 
 | Status | Code | Meaning / client action |
