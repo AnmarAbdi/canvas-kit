@@ -1,0 +1,14 @@
+{
+  "name": "@canvas2026/client",
+  "version": "0.1.0",
+  "description": "x402 paint client for CANVAS 2026 — budget caps, chunking, protocol error handling",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit", "test": "vitest run" },
+  "dependencies": { "@canvas2026/shared": "*" },
+  "devDependencies": { "typescript": "^5.7.3", "vitest": "2.1.9" }
+}
