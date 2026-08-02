@@ -64,8 +64,8 @@ time the race off identical information.
 | Scheme | `exact` | |
 | Network (prod) | `eip155:8453` | x402 v2 identifies networks by CAIP-2, not by the v1 names (`base`). Verified against `@x402/core` 2.20 / `@x402/evm` 2.x. |
 | Network (staging) | `eip155:84532` (Base Sepolia, Circle faucet test USDC) | |
-| Asset (prod) | USDC on Base: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | EIP-3009 domain version `"2"`, 6 decimals |
-| Asset (staging) | USDC on Base Sepolia: `0x036CbD53842c5426634e7929541eC2318f3dCF7e` | `[VERIFIED 2026-08]` against `@x402/evm` default stablecoin registry. EIP-3009 domain version `"2"`, 6 decimals. |
+| Asset (prod) | USDC on Base: `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` | EIP-712 domain **`name: "USD Coin"`, `version: "2"`**, 6 decimals |
+| Asset (staging) | USDC on Base Sepolia: `0x036CbD53842c5426634e7929541eC2318f3dCF7e` | `[VERIFIED 2026-08]` against `@x402/evm` + a live facilitator call. EIP-712 domain **`name: "USDC"`, `version: "2"`**, 6 decimals. **The domain name differs from prod** — it is part of the signature, so the wrong one is rejected. The server publishes it in `accepts[0].extra`; clients MUST sign with what the server sent, never a hardcoded name. |
 | Facilitator | Coinbase CDP (fee-free USDC/Base) | `[VERIFIED 2026-08]` `https://api.cdp.coinbase.com` + route `/platform/v2/x402` → `/verify`, `/settle`. Auth: per-request `Bearer` JWT from a CDP API key id/secret. URL is config-swappable (`FACILITATOR_URL` secret/env), never hardcoded. |
 | `QUOTE_TTL_MS` | 30_000 | Quote nonce lifetime. |
 

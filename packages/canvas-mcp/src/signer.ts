@@ -13,10 +13,12 @@ export function viemSigner(privateKey: string): Signer {
     address: account.address,
     async signTransferAuthorization(input) {
       return account.signTypedData({
-        // USDC's EIP-712 domain. Version '2' on both Base deployments (01-CONSTANTS).
+        // USDC's EIP-712 domain, as the server published it. The name differs by
+        // network ("USD Coin" on Base, "USDC" on Base Sepolia), so it is never
+        // hardcoded here — a wrong domain is an invalid signature.
         domain: {
-          name: 'USDC',
-          version: '2',
+          name: input.domainName,
+          version: input.domainVersion,
           chainId: input.chainId,
           verifyingContract: input.verifyingContract as `0x${string}`,
         },

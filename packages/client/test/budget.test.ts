@@ -51,7 +51,7 @@ function server(options: { unitsPerPixel?: number | ((call: number) => number); 
                 amount: String(total),
                 payTo: '0xTREASURY',
                 maxTimeoutSeconds: 30,
-                extra: { qid: `qid-${quoteCalls}`, quote: `token-${quoteCalls}` },
+                extra: { qid: `qid-${quoteCalls}`, quote: `token-${quoteCalls}`, name: 'USDC', version: '2' },
               },
             ],
           }),
@@ -219,5 +219,55 @@ describe('chunking', () => {
 describe('estimates', () => {
   it('sums the real pricing curve', () => {
     expect(estimateUnits([{ n: 0 }, { n: 1 }, { n: 12 }])).toBe(price(0) + price(1) + price(12));
+  });
+});
+
+describe('EIP-712 domain', () => {
+  it('signs with the domain the SERVER sent, never a hardcoded one', async () => {
+    const captured: { domainName?: string; domainVersion?: string }[] = [];
+    const s = server();
+    const c = new CanvasClient({
+      baseUrl: BASE,
+      budget: { maxTotalUnits: 1_000_000 },
+      signer: {
+        address: '0xPAYER',
+        signTransferAuthorization: async (input) => {
+          captured.push(input);
+          return '0xsignature';
+        },
+      },
+      fetch: s.fetchImpl,
+      sleep: async () => {},
+    });
+
+    await c.paintPixels([{ x: 1, y: 1, c: 1 }]);
+    // The mainnet domain name is "USD Coin" and sepolia's is "USDC"; hardcoding either
+    // makes half of the deployments produce signatures the facilitator rejects.
+    expect(captured[0]?.domainName).toBe('USDC');
+    expect(captured[0]?.domainVersion).toBe('2');
+  });
+
+  it('refuses to sign when the server did not publish a domain', async () => {
+    const naked = (async () =>
+      new Response(
+        JSON.stringify({
+          x402Version: 2,
+          accepts: [
+            {
+              scheme: 'exact',
+              network: 'eip155:84532',
+              asset: '0xasset',
+              amount: '10000',
+              payTo: '0xTREASURY',
+              maxTimeoutSeconds: 30,
+              extra: { qid: 'q', quote: 't' }, // no name/version
+            },
+          ],
+        }),
+        { status: 402 },
+      )) as unknown as typeof globalThis.fetch;
+
+    const c = new CanvasClient({ baseUrl: BASE, budget: { maxTotalUnits: 1_000_000 }, signer, fetch: naked, sleep: async () => {} });
+    await expect(c.paintPixels([{ x: 1, y: 1, c: 1 }])).rejects.toThrow(/EIP-712 domain/);
   });
 });

@@ -43,6 +43,9 @@ export interface Signer {
   signTransferAuthorization(input: {
     chainId: number;
     verifyingContract: string;
+    /** EIP-712 domain from the server's requirements — never hardcode this. */
+    domainName: string;
+    domainVersion: string;
     from: string;
     to: string;
     value: string;
@@ -328,9 +331,18 @@ export class CanvasClient {
     const validBefore = String(Math.floor(this.now() / 1000) + offer.requirements.maxTimeoutSeconds);
     const nonce = randomNonce();
 
+    // The domain travels in `extra` because it is network-specific ("USD Coin" on
+    // mainnet, "USDC" on sepolia) and is part of what gets signed.
+    const extra = offer.requirements.extra as { name?: string; version?: string };
+    if (!extra.name || !extra.version) {
+      throw new Error('402 requirements are missing the EIP-712 domain (extra.name / extra.version)');
+    }
+
     const signature = await signer.signTransferAuthorization({
       chainId,
       verifyingContract: offer.requirements.asset,
+      domainName: extra.name,
+      domainVersion: extra.version,
       from: signer.address,
       to: offer.requirements.payTo,
       value: offer.requirements.amount,

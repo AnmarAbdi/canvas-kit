@@ -133,11 +133,37 @@ export const USDC_DECIMALS = 6;
 /** EIP-712 domain version of both USDC deployments (needed to verify EIP-3009 sigs). */
 export const USDC_EIP712_VERSION = '2';
 
-/** Asset + network for an environment. Keeps callers from pairing a testnet id with a mainnet asset. */
-export function paymentTarget(staging: boolean): { network: string; asset: string } {
+/**
+ * EIP-712 domain NAME of the USDC contract — and it is NOT the same on both networks.
+ * Base mainnet is "USD Coin"; Base Sepolia is "USDC". The name is part of the signed
+ * domain separator, so getting it wrong produces a signature the facilitator rejects.
+ * Verified against @x402/evm's stablecoin registry and confirmed by a live 400 from the
+ * CDP facilitator ("missing EIP-712 domain name/version in requirements.extra").
+ */
+export const USDC_EIP712_NAME_PROD = 'USD Coin';
+export const USDC_EIP712_NAME_STAGING = 'USDC';
+
+export interface PaymentTarget {
+  network: string;
+  asset: string;
+  /** Goes into PaymentRequirements.extra; the facilitator requires it. */
+  eip712: { name: string; version: string };
+}
+
+/** Asset + network + signing domain for an environment. Keeps callers from pairing a
+ *  testnet id with a mainnet asset, or either with the wrong domain name. */
+export function paymentTarget(staging: boolean): PaymentTarget {
   return staging
-    ? { network: NETWORK_STAGING, asset: USDC_ADDRESS_STAGING }
-    : { network: NETWORK_PROD, asset: USDC_ADDRESS_PROD };
+    ? {
+        network: NETWORK_STAGING,
+        asset: USDC_ADDRESS_STAGING,
+        eip712: { name: USDC_EIP712_NAME_STAGING, version: USDC_EIP712_VERSION },
+      }
+    : {
+        network: NETWORK_PROD,
+        asset: USDC_ADDRESS_PROD,
+        eip712: { name: USDC_EIP712_NAME_PROD, version: USDC_EIP712_VERSION },
+      };
 }
 
 /** CDP facilitator route prefix. Base URL is config (FACILITATOR_URL), never hardcoded. */

@@ -108,8 +108,20 @@ describe('constants.ts matches 01-CONSTANTS.md', () => {
 
   it('staging USDC address matches the doc (resolved at M3 from @x402/evm)', () => {
     expect(CONSTANTS_DOC).toContain(C.USDC_ADDRESS_STAGING);
-    expect(C.paymentTarget(true)).toEqual({ network: C.NETWORK_STAGING, asset: C.USDC_ADDRESS_STAGING });
-    expect(C.paymentTarget(false)).toEqual({ network: C.NETWORK_PROD, asset: C.USDC_ADDRESS_PROD });
+    expect(C.paymentTarget(true)).toEqual({
+      network: C.NETWORK_STAGING,
+      asset: C.USDC_ADDRESS_STAGING,
+      eip712: { name: 'USDC', version: '2' },
+    });
+    expect(C.paymentTarget(false)).toEqual({
+      network: C.NETWORK_PROD,
+      asset: C.USDC_ADDRESS_PROD,
+      eip712: { name: 'USD Coin', version: '2' },
+    });
+    // The domain name is network-specific and part of the signature: mixing them up
+    // yields a signature the facilitator rejects, which is a launch-day outage.
+    expect(C.USDC_EIP712_NAME_PROD).not.toBe(C.USDC_EIP712_NAME_STAGING);
+    expect(CONSTANTS_DOC).toContain('USD Coin');
   });
 });
 
