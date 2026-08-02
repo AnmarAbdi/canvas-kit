@@ -56,7 +56,7 @@ describe('constants.ts matches 01-CONSTANTS.md', () => {
   it('palette size', () => {
     expect(C.PALETTE_SIZE).toBe(docNumber('PALETTE'));
     expect(docCell('PALETTE')).toContain('1 byte/pixel');
-    expect(docNotes('PALETTE')).toContain('Index 0 = blank/white');
+    expect(docNotes('PALETTE')).toContain('Index 0 = `#FFFFFF` = blank/white');
   });
 
   it.each([
@@ -114,7 +114,8 @@ describe('constants.ts matches 01-CONSTANTS.md', () => {
 });
 
 describe('M0 gate: remaining [DECIDE] markers', () => {
-  const ALLOWED = /palette|LAUNCH_AT|domain|name/i;
+  // Palette resolved 2026-08; only launch timing and naming remain.
+  const ALLOWED = /LAUNCH_AT|domain|name/i;
 
   it('kit contract docs only defer palette hexes, LAUNCH_AT and name/domain', () => {
     const offenders: string[] = [];

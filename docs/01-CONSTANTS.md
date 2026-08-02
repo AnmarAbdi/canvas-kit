@@ -14,7 +14,7 @@ Server-internal tunables (tile size, cache TTLs, rate limits) live in
 |---|---|---|
 | `CANVAS_W` × `CANVAS_H` | 500 × 500 | Launch size. Expansions are post-launch (see spec §2). |
 | `ORIGIN` | (0,0) top-left | x→right, y→down |
-| `PALETTE` | 32 colors, 1 byte/pixel | `[DECIDE]` final hex list → `packages/shared/palette.json`. MUST include uhqi red / yellow / blue / black. Index 0 = blank/white. |
+| `PALETTE` | 32 colors, 1 byte/pixel | **LOCKED**: the r/place 2022 palette — full hex list in `packages/shared/src/palette.json` (source: lospec.com/palette-list/r-place-2022-32-colors, cross-checked against place-wiki.stefanocoding.me). Index 0 = `#FFFFFF` = blank/white. Order is wire order and is frozen: an index is a byte in every snapshot, so entries may never be reordered or removed — only a new canvas gets a new palette. |
 
 ## Pricing (paid API)
 
