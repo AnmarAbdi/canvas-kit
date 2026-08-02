@@ -71,6 +71,14 @@ Rules:
 - Stateless verification: signature + `exp` check. No storage on issue.
 - **Single-use**: on successful settle, `qid` enters a consumed-set (per-tile DO,
   entries evicted after `exp`). A replayed `qid` → `422 QUOTE_CONSUMED`.
+- **Idempotency is separate from the consumed-set and lives at the Worker layer**,
+  keyed by `qid`, holding the composed `200` response (receipt + new pixel state) for
+  10 min. A request spans one or more tiles but has exactly one `qid` and exactly one
+  receipt, so no single tile can own the canonical response. Order on a retry:
+  Worker checks the idempotency cache BEFORE any tile work — a cache hit replays the
+  stored `200` verbatim (interleaving #10) and never re-enters the commit path; a miss
+  proceeds, and the tiles' consumed-set is what makes a *late* replay `422`
+  (interleaving #4) once the cache entry has expired.
 - The client's payment authorization is bound to the quote by including `qid` in the
   x402 `extra` field the payload signs over. Verify MUST check payload amount ==
   `total` and payload-bound `qid` == quote `qid`.
@@ -152,7 +160,7 @@ Two payers A, B; pixel P at repaint index n. Each row is a required integration 
 | 7 | A's request spans two tiles; tile 2 has one immune pixel | Whole request fails, no pixel in tile 1 written, nothing settled. |
 | 8 | A's verify passes; commit time `>= FREEZE_AT` | `410 FROZEN`, never settled. Applies even if the 402 was issued pre-freeze. |
 | 9 | Freeze-boundary storm: many valid payments in flight at `FREEZE_AT` | Every commit with DO timestamp `< FREEZE_AT` settles; every other one returns `410` and never settles. Zero settlements timestamped post-freeze — audited invariant. |
-| 10 | Duplicate identical request (network retry, same payment header) | Idempotent on `qid`: if already settled, return the original `200` + receipt (idempotency cache, TTL 10 min), not a double write. |
+| 10 | Duplicate identical request (network retry, same payment header) | Idempotent on `qid`: if already settled, return the original `200` + receipt byte-for-byte from the Worker-level idempotency cache (TTL 10 min, §3), not a double write. After that TTL, the tile consumed-set answers `422 QUOTE_CONSUMED` — never a second write. |
 
 ## 8. Receipts
 
