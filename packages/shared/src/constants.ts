@@ -114,21 +114,34 @@ export const HEADER_PAYMENT_RESPONSE = 'PAYMENT-RESPONSE';
 export const HEADER_PAYMENT_REQUEST_V1 = 'X-PAYMENT';
 export const HEADER_PAYMENT_RESPONSE_V1 = 'X-PAYMENT-RESPONSE';
 
-export const NETWORK_PROD = 'base';
-export const NETWORK_STAGING = 'base-sepolia';
+/**
+ * x402 v2 identifies networks by CAIP-2, not by the v1 short names ('base').
+ * Verified against @x402/core 2.20 / @x402/evm 2.x at implementation time.
+ */
+export const NETWORK_PROD = 'eip155:8453';
+export const NETWORK_STAGING = 'eip155:84532';
 
-/** USDC on Base (mainnet). */
+/** USDC on Base (mainnet). EIP-3009 domain version '2'. */
 export const USDC_ADDRESS_PROD = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 
-/**
- * USDC on Base Sepolia.
- * [VERIFY] at implementation time from current Circle docs — do not trust training
- * memory. Left null so nothing can silently ship a wrong address (M3, not M0).
- */
-export const USDC_ADDRESS_STAGING: string | null = null;
+/** USDC on Base Sepolia. [VERIFIED 2026-08] against @x402/evm's stablecoin registry. */
+export const USDC_ADDRESS_STAGING = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
 
 /** USDC atomic units: 6 decimals. */
 export const USDC_DECIMALS = 6;
+
+/** EIP-712 domain version of both USDC deployments (needed to verify EIP-3009 sigs). */
+export const USDC_EIP712_VERSION = '2';
+
+/** Asset + network for an environment. Keeps callers from pairing a testnet id with a mainnet asset. */
+export function paymentTarget(staging: boolean): { network: string; asset: string } {
+  return staging
+    ? { network: NETWORK_STAGING, asset: USDC_ADDRESS_STAGING }
+    : { network: NETWORK_PROD, asset: USDC_ADDRESS_PROD };
+}
+
+/** CDP facilitator route prefix. Base URL is config (FACILITATOR_URL), never hardcoded. */
+export const FACILITATOR_ROUTE_PREFIX = '/platform/v2/x402';
 
 /** Quote nonce lifetime. */
 export const QUOTE_TTL_MS = 30_000;

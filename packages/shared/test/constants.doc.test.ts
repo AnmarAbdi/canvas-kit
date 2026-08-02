@@ -104,7 +104,12 @@ describe('constants.ts matches 01-CONSTANTS.md', () => {
     expect(docCell('LAUNCH_AT')).toContain('[DECIDE]');
     expect(C.LAUNCH_AT).toBeNull();
     expect(C.CANVAS_DOMAIN).toBeNull();
-    expect(C.USDC_ADDRESS_STAGING).toBeNull(); // [VERIFY] at M3, from Circle docs
+  });
+
+  it('staging USDC address matches the doc (resolved at M3 from @x402/evm)', () => {
+    expect(CONSTANTS_DOC).toContain(C.USDC_ADDRESS_STAGING);
+    expect(C.paymentTarget(true)).toEqual({ network: C.NETWORK_STAGING, asset: C.USDC_ADDRESS_STAGING });
+    expect(C.paymentTarget(false)).toEqual({ network: C.NETWORK_PROD, asset: C.USDC_ADDRESS_PROD });
   });
 });
 
