@@ -79,9 +79,19 @@ Rules:
   stored `200` verbatim (interleaving #10) and never re-enters the commit path; a miss
   proceeds, and the tiles' consumed-set is what makes a *late* replay `422`
   (interleaving #4) once the cache entry has expired.
-- The client's payment authorization is bound to the quote by including `qid` in the
-  x402 `extra` field the payload signs over. Verify MUST check payload amount ==
-  `total` and payload-bound `qid` == quote `qid`.
+- **Binding.** The `exact` scheme's signature is an EIP-3009 authorization covering
+  exactly `(from, to, value, validAfter, validBefore, nonce)` — there is nowhere in it
+  to sign over a server blob. So the quote is bound to the payment on the server side,
+  not inside the signature:
+  - the client echoes the quote token back in the `X-Canvas-Quote` header (04-API);
+  - the server rebuilds `PaymentRequirements` **from its own signed quote** and sends
+    those to `/verify` and `/settle` — never the client's copy;
+  - the server MUST reject, before calling the facilitator, any payload whose
+    `accepted` block disagrees with those requirements on `extra.qid`, `amount`,
+    `asset`, `payTo`, `network` or `scheme`.
+  The signature is therefore verified against terms the server chose, and `qid`
+  (carried in `extra`, which is part of the verified requirements) is what ties one
+  payment to one quote.
 - A quote does NOT reserve anything. Reservation is decoration; CAS is the truth.
 
 ## 4. Commit rules (per-tile Durable Object, serialized)

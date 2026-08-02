@@ -49,6 +49,24 @@ Body: `{ canvas:"2026", version:1, pixels:[{x,y,c}], handle?, url? }` — `handl
 apply to every pixel in the request (a "block" is just a bulk placement with shared
 metadata). Unpaid → 402 quote. Paid + valid → 200 `{ receipt, pixels: [new state] }`.
 
+The 402 body is an x402 v2 `PaymentRequired`: top-level `resource`, plus `accepts[0]`
+with `{scheme, network, asset, amount, payTo, maxTimeoutSeconds, extra}`. `network` is
+a CAIP-2 id (`eip155:8453`), `extra.qid` is the quote id the payment binds to, and
+`extra.quote` is the signed quote token.
+
+**Paying requires two headers:**
+
+| Header | Value |
+|---|---|
+| `PAYMENT-SIGNATURE` | base64url x402 v2 `PaymentPayload` (v1 clients: `X-PAYMENT`) |
+| `X-Canvas-Quote` | the `extra.quote` token from the 402, echoed verbatim |
+
+The second header exists because an EIP-3009 signature cannot cover a server blob
+(03-PROTOCOL §3). The server re-derives the payment requirements from that token and
+rejects any payload disagreeing with them on `extra.qid`, `amount`, `asset`, `payTo`,
+`network` or `scheme` — before spending a facilitator call. A missing or unparseable
+`X-Canvas-Quote` is `422 QUOTE_INVALID`.
+
 ### `POST /api/free-paint`
 Body `{ x, y, c, handle?, turnstile_token }` + session cookie. One pixel per call.
 Errors: `403 TURNSTILE_FAILED`, `429 COOLDOWN` (`retry_after_ms`), `409 NOT_BLANK`
