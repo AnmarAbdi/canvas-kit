@@ -112,14 +112,23 @@ Order: verify → commit → settle. Each step's failure handling:
 - **Commit fails** (any §4 rule) → no settle → `402` fresh quote / terminal error.
 - **Commit succeeds** → affected pixels are flagged `SETTLING` (immunity already
   covers them for 60s, but `SETTLING` additionally blocks moderation repaints and
-  survives if settlement outlasts immunity). Server calls `/settle`.
-  - **Settle succeeds** → clear `SETTLING`, append history, emit diff broadcast,
-    return `200` + receipt.
+  survives if settlement outlasts immunity), **and the diff is broadcast immediately**.
+  The pixel is visible from the moment it commits — that is what makes the revert below
+  observable rather than silent. Server calls `/settle`.
+  - **Settle succeeds** → clear `SETTLING`, append history, return `200` + receipt.
+    No second diff: viewers already have this pixel.
   - **Settle fails after bounded retries** (N=3, backoff, hard deadline 20s) →
     **compensating revert**: the tile DO restores the prior pixel state, decrements
-    the repaint index back, logs `kind=reverted` in history (public — reverts are
-    provenance too), returns `502 SETTLEMENT_FAILED` to the payer. The payer was
-    never charged (authorization unexecuted, expires on its own).
+    the repaint index back, **broadcasts a second diff with `kind=reverted`**, logs
+    `kind=reverted` in history (public — reverts are provenance too), returns
+    `502 SETTLEMENT_FAILED` to the payer. The payer was never charged (authorization
+    unexecuted, expires on its own).
+
+**Diffs follow the commit; history follows the money.** A committed-then-reverted write
+produces two diff frames (the write, then the revert) and exactly one history row
+(`kind=reverted`) — never a `kind=paid` row, because nobody paid. That is what keeps
+the ledger equal to the settled receipts while the diff stream still tells the truth
+about what viewers saw.
 - Any paint attempt hitting a `SETTLING` pixel → `409 SETTLING`, `Retry-After: 1`.
 - The `/settle` call happens OUTSIDE the DO's request path (queued from the DO,
   awaited by the Worker) — a facilitator stall must never block the tile.
@@ -155,7 +164,7 @@ Two payers A, B; pixel P at repaint index n. Each row is a required integration 
 | 2 | A paints P; B attempts within immunity window | B → `409 IMMUNE`, not settled. |
 | 3 | A's quote expires before retry | `422 QUOTE_EXPIRED`, nothing written/settled. |
 | 4 | A replays a settled quote (`qid` reuse) | `422 QUOTE_CONSUMED`. |
-| 5 | A commits; facilitator `/settle` fails all retries | Revert: P restored to prior state and index, history logs `reverted`, A gets `502`, A never charged. Diff stream reflects both the write and the revert. |
+| 5 | A commits; facilitator `/settle` fails all retries | Revert: P restored to prior state and index, history logs exactly one `reverted` row and no `paid` row, A gets `502`, A never charged. Diff stream carries both frames — the commit-time write, then the revert (§5). |
 | 6 | B attempts P while A's settle in flight | `409 SETTLING`, retry succeeds/fails on real state afterward. |
 | 7 | A's request spans two tiles; tile 2 has one immune pixel | Whole request fails, no pixel in tile 1 written, nothing settled. |
 | 8 | A's verify passes; commit time `>= FREEZE_AT` | `410 FROZEN`, never settled. Applies even if the 402 was issued pre-freeze. |
