@@ -13,7 +13,7 @@ on any drift. Never inline a game-rule number anywhere else. Server-internal tun
 | Module | What |
 |---|---|
 | `constants.ts` | canvas size, `price(n)`, immunity, freeze, free tier, payment identifiers |
-| `palette.json` / `palette.ts` | 32 palette slots + loader. **Placeholder**: only index 0 (blank/white) is decided |
+| `palette.json` / `palette.ts` | the locked r/place 2022 32-colour palette + loader. Index 0 = blank/white; wire order, never reordered |
 | `types.ts` | `Pixel`, `Job`, `Quote`, `Receipt`, `PixelMeta`, `DiffFrame`, `ErrorCode` (04-API / 03-PROTOCOL shapes) |
 | `codecs/w1.ts` | snapshot / region grid: row-major `w*h` bytes, one palette index per pixel, no header |
 | `codecs/w2.ts` | WS diff frame: `u8 version, u32 seq, u16 count, count × {u16 x, u16 y, u8 c, u8 kind}` |
@@ -27,10 +27,7 @@ on any drift. Never inline a game-rule number anywhere else. Server-internal tun
 
 ## Open items (human decisions, not agent-fillable)
 
-- Palette hexes — `palette.json` entries 1..31 are `null`; `requireColorHex()` throws
-  rather than guessing. Flip `decided: true` in the same commit that fills them in.
 - `LAUNCH_AT`, `CANVAS_DOMAIN` — `null` until decided.
-- `USDC_ADDRESS_STAGING` — `null`, `[VERIFY]` from Circle docs at M3.
 
 W2 byte order is **big-endian**, locked in 04-API "Wire formats" — not an open item.
 
