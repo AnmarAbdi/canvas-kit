@@ -3,7 +3,7 @@
  * CLI wrapper around `runPainter`. Kept separate so the painter can be imported (and
  * tested) without a module-level CLI firing.
  *
- *   CANVAS_WALLET_KEY=0x… node painter-cli.js job.json --budget 5.00 --handle me
+ *   CANVAS_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle me
  */
 import { readFileSync } from 'node:fs';
 import { CanvasClient } from '@canvas2026/client';
@@ -18,7 +18,7 @@ const flag = (name: string) => {
 };
 
 if (!jobPath) {
-  console.error('usage: painter.js <job.json> --budget <dollars> [--handle name] [--url https://…]');
+  console.error('usage: painter-cli.ts <job.json> --budget <dollars> [--handle name] [--url https://…]');
   process.exit(1);
 }
 
