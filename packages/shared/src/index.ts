@@ -1,6 +1,6 @@
 /**
- * @canvas2026/shared — the only place game rules, wire types and codecs live.
- * Generated off canvas-kit/docs/01-CONSTANTS.md + 04-API.md; consumed by both repos.
+ * @yearbook2026/shared — the only place game rules, wire types and codecs live.
+ * Generated off yearbook-kit/docs/01-CONSTANTS.md + 04-API.md; consumed by both repos.
  */
 export * from './constants.js';
 export * from './palette.js';

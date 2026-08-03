@@ -1,12 +1,12 @@
 /**
- * CANVAS 2026 — game rules.
+ * YEARBOOK 2026 — game rules.
  *
- * GENERATED FROM: canvas-kit/docs/01-CONSTANTS.md (that doc is the single source of
+ * GENERATED FROM: yearbook-kit/docs/01-CONSTANTS.md (that doc is the single source of
  * truth). Do not change a value here without changing it there first; the doc-sync
  * test (test/constants.doc.test.ts) fails the build if the two drift.
  *
  * Server-internal tunables (tile size, cache TTLs, rate limits) do NOT belong here —
- * they live in canvas-server/docs/05-ARCHITECTURE.md.
+ * they live in yearbook-server/docs/05-ARCHITECTURE.md.
  *
  * Money is integer USDC atomic units (6 decimals). No floats. Time is epoch ms, UTC.
  */
@@ -191,10 +191,10 @@ export function isFrozen(committedAt: number): boolean {
 export const LAUNCH_AT: number | null = null;
 
 /** [DECIDE] — standalone vs 2026.uhqi.club. Base URL is config until then. */
-export const CANVAS_DOMAIN: string | null = null;
+export const YEARBOOK_DOMAIN: string | null = null;
 
-/** Canvas identifier carried in job/quote/paint bodies. */
-export const CANVAS_ID = '2026';
+/** Yearbook identifier carried in job/quote/paint bodies. */
+export const YEARBOOK_ID = '2026';
 
-/** X-Canvas-Api header value / `version` field in job bodies (04-API "Versioning"). */
+/** X-Yearbook-Api header value / `version` field in job bodies (04-API "Versioning"). */
 export const API_VERSION = 1;

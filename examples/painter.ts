@@ -8,12 +8,12 @@
  * is commented with *why*, not what.
  *
  * Library half — `painter-cli.ts` is the runnable one:
- *   CANVAS_WALLET_KEY=0x… node painter-cli.js job.json --budget 5.00 --handle me
+ *   YEARBOOK_WALLET_KEY=0x… node painter-cli.js job.json --budget 5.00 --handle me
  */
-import { CanvasClient, BudgetExceededError } from '@canvas2026/client';
+import { YearbookClient, BudgetExceededError } from '@yearbook2026/client';
 
 export interface PainterOptions {
-  client: CanvasClient;
+  client: YearbookClient;
   job: { pixels: { x: number; y: number; c: number }[] };
   handle?: string;
   url?: string;

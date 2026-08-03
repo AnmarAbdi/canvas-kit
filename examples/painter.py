@@ -8,7 +8,7 @@ Same loop as painter.ts, and the same non-negotiables:
   * every error in 03-PROTOCOL §6 is handled explicitly, and commented.
 
 Install:  pip install requests eth-account
-Run:      CANVAS_WALLET_KEY=0x... python painter.py job.json --budget 5.00
+Run:      YEARBOOK_WALLET_KEY=0x... python painter.py job.json --budget 5.00
 
 The wallet key never leaves this process; it signs an EIP-3009 authorization for the
 exact amount the server quoted, and the facilitator submits it.
@@ -29,7 +29,7 @@ import requests
 from eth_account import Account
 from eth_account.messages import encode_typed_data
 
-CANVAS_ID = "2026"
+YEARBOOK_ID = "2026"
 API_VERSION = 1
 TILE_SIZE = 100
 MAX_PIXELS_PER_REQUEST = 50
@@ -65,7 +65,7 @@ def chunk_by_tile(pixels: list[dict], max_per_request: int = MAX_PIXELS_PER_REQU
 
 
 @dataclass
-class CanvasClient:
+class YearbookClient:
     base_url: str
     private_key: str
     max_total_units: int
@@ -164,7 +164,7 @@ class CanvasClient:
 
     def paint_chunk(self, pixels: list[dict], handle: str | None = None) -> tuple[list[dict], list[dict], int]:
         """Returns (painted, retry, wait_ms). Raises on budget or freeze."""
-        body = {"canvas": CANVAS_ID, "version": API_VERSION, "pixels": pixels}
+        body = {"yearbook": YEARBOOK_ID, "version": API_VERSION, "pixels": pixels}
         if handle:
             body["handle"] = handle
 
@@ -195,12 +195,12 @@ class CanvasClient:
                     return [], [], 0
                 return self.paint_chunk(affordable, handle)
 
-        # 3. sign and resubmit. The quote token rides in X-Canvas-Quote (04-API):
+        # 3. sign and resubmit. The quote token rides in X-Yearbook-Quote (04-API):
         #    an EIP-3009 signature has nowhere to carry it.
         payload = self._sign_authorization(requirements)
         extra = {k: v for k, v in requirements["extra"].items() if k != "quote"}
         headers = {
-            "X-Canvas-Quote": quote_token,
+            "X-Yearbook-Quote": quote_token,
             "PAYMENT-SIGNATURE": b64url_json(
                 {
                     "x402Version": 2,
@@ -266,27 +266,27 @@ class CanvasClient:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="paint a job.json onto CANVAS 2026")
+    parser = argparse.ArgumentParser(description="paint a job.json onto YEARBOOK 2026")
     parser.add_argument("job", help="path to job.json")
     parser.add_argument("--budget", type=float, required=True, help="hard cap in dollars, e.g. 5.00")
     parser.add_argument("--per-pixel-max", type=float, default=None, help="skip pixels above this price")
     parser.add_argument("--handle", default=None)
-    parser.add_argument("--base-url", default=os.environ.get("CANVAS_API_BASE", "https://canvas2026.example"))
+    parser.add_argument("--base-url", default=os.environ.get("YEARBOOK_API_BASE", "https://yearbook2026.example"))
     parser.add_argument("--passes", type=int, default=50)
     args = parser.parse_args()
 
-    key = os.environ.get("CANVAS_WALLET_KEY")
+    key = os.environ.get("YEARBOOK_WALLET_KEY")
     if not key:
-        print("CANVAS_WALLET_KEY is not set", file=sys.stderr)
+        print("YEARBOOK_WALLET_KEY is not set", file=sys.stderr)
         return 1
 
     with open(args.job) as handle:
         job = json.load(handle)
-    if job.get("canvas") != CANVAS_ID or job.get("version") != API_VERSION:
-        print("job.json is not a v1 job for canvas 2026", file=sys.stderr)
+    if job.get("yearbook") != YEARBOOK_ID or job.get("version") != API_VERSION:
+        print("job.json is not a v1 job for yearbook 2026", file=sys.stderr)
         return 1
 
-    client = CanvasClient(
+    client = YearbookClient(
         base_url=args.base_url,
         private_key=key,
         max_total_units=round(args.budget * 1_000_000),

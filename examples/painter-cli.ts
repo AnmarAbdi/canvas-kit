@@ -3,12 +3,12 @@
  * CLI wrapper around `runPainter`. Kept separate so the painter can be imported (and
  * tested) without a module-level CLI firing.
  *
- *   CANVAS_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle me
+ *   YEARBOOK_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle me
  */
 import { readFileSync } from 'node:fs';
-import { CanvasClient } from '@canvas2026/client';
-import { validateJob } from '@canvas2026/converter';
-import { viemSigner } from '@canvas2026/canvas-mcp/signer';
+import { YearbookClient } from '@yearbook2026/client';
+import { validateJob } from '@yearbook2026/converter';
+import { viemSigner } from '@yearbook2026/yearbook-mcp/signer';
 import { runPainter } from './painter.js';
 
 const [, , jobPath, ...rest] = process.argv;
@@ -34,14 +34,14 @@ if (!(dollars > 0)) {
   process.exit(1);
 }
 
-const key = process.env['CANVAS_WALLET_KEY'];
+const key = process.env['YEARBOOK_WALLET_KEY'];
 if (!key) {
-  console.error('CANVAS_WALLET_KEY is not set');
+  console.error('YEARBOOK_WALLET_KEY is not set');
   process.exit(1);
 }
 
-const client = new CanvasClient({
-  baseUrl: process.env['CANVAS_API_BASE'] ?? 'https://canvas2026.example',
+const client = new YearbookClient({
+  baseUrl: process.env['YEARBOOK_API_BASE'] ?? 'https://yearbook2026.example',
   budget: {
     maxTotalUnits: Math.round(dollars * 1e6),
     ...(flag('per-pixel-max') ? { perPixelCeilingUnits: Math.round(Number(flag('per-pixel-max')) * 1e6) } : {}),

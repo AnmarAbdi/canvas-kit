@@ -4,7 +4,7 @@
  * amount the server quoted.
  */
 import { privateKeyToAccount } from 'viem/accounts';
-import type { Signer } from '@canvas2026/client';
+import type { Signer } from '@yearbook2026/client';
 
 export function viemSigner(privateKey: string): Signer {
   const account = privateKeyToAccount(privateKey as `0x${string}`);

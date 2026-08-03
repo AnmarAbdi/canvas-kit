@@ -6,8 +6,8 @@
  * quote and payment, and must not be bypassable by chunking a big job into small ones.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { PRICE_BASE_UNITS, price } from '@canvas2026/shared';
-import { CanvasClient, BudgetExceededError, chunkByTile, estimateUnits } from '../src/index.js';
+import { PRICE_BASE_UNITS, price } from '@yearbook2026/shared';
+import { YearbookClient, BudgetExceededError, chunkByTile, estimateUnits } from '../src/index.js';
 
 const BASE = 'https://canvas.test';
 
@@ -86,7 +86,7 @@ const signer = {
 function client(maxTotalUnits: number, s = server(), extra: { perPixelCeilingUnits?: number } = {}) {
   return {
     s,
-    client: new CanvasClient({
+    client: new YearbookClient({
       baseUrl: BASE,
       budget: { maxTotalUnits, ...extra },
       signer,
@@ -114,7 +114,7 @@ describe('the hard stop', () => {
   it('stops mid-job once the budget runs out instead of finishing the job', async () => {
     // Budget covers 3 pixels; the job is 10, chunked 1 per request.
     const s = server();
-    const c = new CanvasClient({
+    const c = new YearbookClient({
       baseUrl: BASE,
       budget: { maxTotalUnits: PRICE_BASE_UNITS * 3 },
       signer,
@@ -130,7 +130,7 @@ describe('the hard stop', () => {
 
   it('cannot be walked past by splitting a job into many small requests', async () => {
     const s = server();
-    const c = new CanvasClient({
+    const c = new YearbookClient({
       baseUrl: BASE,
       budget: { maxTotalUnits: PRICE_BASE_UNITS * 4 },
       signer,
@@ -152,7 +152,7 @@ describe('the hard stop', () => {
   it('catches a price that moved between the estimate and the quote', async () => {
     // The server quotes cheap once, then 100× — a contested pixel escalating under us.
     const s = server({ unitsPerPixel: (call) => (call === 0 ? PRICE_BASE_UNITS : PRICE_BASE_UNITS * 100) });
-    const c = new CanvasClient({
+    const c = new YearbookClient({
       baseUrl: BASE,
       budget: { maxTotalUnits: PRICE_BASE_UNITS * 10 },
       signer,
@@ -165,13 +165,13 @@ describe('the hard stop', () => {
   });
 
   it('rejects a nonsensical budget at construction', () => {
-    expect(() => new CanvasClient({ baseUrl: BASE, budget: { maxTotalUnits: -1 } })).toThrow(RangeError);
-    expect(() => new CanvasClient({ baseUrl: BASE, budget: { maxTotalUnits: 1.5 } })).toThrow(RangeError);
+    expect(() => new YearbookClient({ baseUrl: BASE, budget: { maxTotalUnits: -1 } })).toThrow(RangeError);
+    expect(() => new YearbookClient({ baseUrl: BASE, budget: { maxTotalUnits: 1.5 } })).toThrow(RangeError);
   });
 
   it('will not paint at all without a signer, but still reads and quotes', async () => {
     const s = server();
-    const c = new CanvasClient({ baseUrl: BASE, budget: { maxTotalUnits: 1_000_000 }, fetch: s.fetchImpl, sleep: async () => {} });
+    const c = new YearbookClient({ baseUrl: BASE, budget: { maxTotalUnits: 1_000_000 }, fetch: s.fetchImpl, sleep: async () => {} });
 
     await expect(c.paintPixels(pixels(1))).rejects.toThrow(/no signer/);
     await expect(c.quote(pixels(1))).resolves.toMatchObject({ total_units: PRICE_BASE_UNITS });
@@ -226,7 +226,7 @@ describe('EIP-712 domain', () => {
   it('signs with the domain the SERVER sent, never a hardcoded one', async () => {
     const captured: { domainName?: string; domainVersion?: string }[] = [];
     const s = server();
-    const c = new CanvasClient({
+    const c = new YearbookClient({
       baseUrl: BASE,
       budget: { maxTotalUnits: 1_000_000 },
       signer: {
@@ -267,7 +267,7 @@ describe('EIP-712 domain', () => {
         { status: 402 },
       )) as unknown as typeof globalThis.fetch;
 
-    const c = new CanvasClient({ baseUrl: BASE, budget: { maxTotalUnits: 1_000_000 }, signer, fetch: naked, sleep: async () => {} });
+    const c = new YearbookClient({ baseUrl: BASE, budget: { maxTotalUnits: 1_000_000 }, signer, fetch: naked, sleep: async () => {} });
     await expect(c.paintPixels([{ x: 1, y: 1, c: 1 }])).rejects.toThrow(/EIP-712 domain/);
   });
 });

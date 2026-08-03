@@ -15,11 +15,11 @@
  * Strategy: watch the live diff stream, and when something inside the job's bounding
  * box changes, queue that pixel for repair the moment its immunity lapses.
  */
-import { decodeW2, IMMUNITY_MS, type DiffPixel, type Job } from '@canvas2026/shared';
-import { CanvasClient, BudgetExceededError, boundingBox } from '@canvas2026/client';
+import { decodeW2, IMMUNITY_MS, type DiffPixel, type Job } from '@yearbook2026/shared';
+import { YearbookClient, BudgetExceededError, boundingBox } from '@yearbook2026/client';
 
 export interface DefenderOptions {
-  client: CanvasClient;
+  client: YearbookClient;
   job: Job;
   /** Fires the callback for every incoming diff frame; injected so tests can drive it. */
   subscribe(onDiff: (pixels: DiffPixel[]) => void): { close(): void };

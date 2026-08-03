@@ -1,5 +1,5 @@
 /**
- * `@canvas2026/client` — the paint client every kit tool is built on.
+ * `@yearbook2026/client` — the paint client every kit tool is built on.
  *
  * Two things here are non-negotiable, both from 07-AGENT-KIT §2:
  *
@@ -16,14 +16,14 @@
  */
 import {
   BULK_MAX_PIXELS,
-  CANVAS_ID,
+  YEARBOOK_ID,
   API_VERSION,
   price,
   type Job,
   type Pixel,
   type PixelMeta,
   type Receipt,
-} from '@canvas2026/shared';
+} from '@yearbook2026/shared';
 
 export const TILE_SIZE = 100; // matches the server's sharding; only affects batching
 
@@ -109,7 +109,7 @@ interface QuoteOffer {
   total: number;
 }
 
-export class CanvasClient {
+export class YearbookClient {
   private spent = 0;
   private readonly fetchImpl: typeof globalThis.fetch;
   private readonly sleep: (ms: number) => Promise<void>;
@@ -209,7 +209,7 @@ export class CanvasClient {
     options: { handle?: string; url?: string },
   ): Promise<{ painted: Pixel[]; skipped: { pixel: Pixel; reason: string }[]; retry: Pixel[]; waitMs: number; spentUnits: number; receipt?: Receipt }> {
     const body = {
-      canvas: CANVAS_ID,
+      yearbook: YEARBOOK_ID,
       version: API_VERSION,
       pixels,
       ...(options.handle ? { handle: options.handle } : {}),
@@ -260,7 +260,7 @@ export class CanvasClient {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'X-Canvas-Quote': offer.token,
+        'X-Yearbook-Quote': offer.token,
         'PAYMENT-SIGNATURE': payment,
       },
       body: JSON.stringify(body),

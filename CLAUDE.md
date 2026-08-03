@@ -1,6 +1,6 @@
-# canvas-kit (PUBLIC)
+# yearbook-kit (PUBLIC)
 
-Open-source half of CANVAS 2026: contract docs + agent tooling. Everything here is
+Open-source half of YEARBOOK 2026: contract docs + agent tooling. Everything here is
 public; write accordingly (no secrets, no ops detail, no internal URLs).
 
 ## Doc map (docs/ here is CANONICAL for all contracts)
@@ -12,7 +12,7 @@ public; write accordingly (no secrets, no ops detail, no internal URLs).
 
 ## Layout (target)
 packages/shared (constants, palette, types, W1/W2 codecs — consumed by server repo)
-packages/canvas-mcp · examples/painter.{ts,py} · examples/defender.ts
+packages/yearbook-mcp · examples/painter.{ts,py} · examples/defender.ts
 (the website lives in the server repo — this repo is tooling + contracts only)
 
 ## Conventions

@@ -4,12 +4,12 @@
  * cost so the model can decide instead of guess.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { PRICE_BASE_UNITS, BULK_MAX_PIXELS, CANVAS_W } from '@canvas2026/shared';
-import type { CanvasClient } from '@canvas2026/client';
+import { PRICE_BASE_UNITS, BULK_MAX_PIXELS, CANVAS_W } from '@yearbook2026/shared';
+import type { YearbookClient } from '@yearbook2026/client';
 import { getRegion, quote, diffJob, paintPixels, getStats } from '../src/tools.js';
 import { configFromEnv } from '../src/index.js';
 
-function fakeClient(overrides: Partial<Record<keyof CanvasClient, unknown>> = {}): CanvasClient {
+function fakeClient(overrides: Partial<Record<keyof YearbookClient, unknown>> = {}): YearbookClient {
   const base = {
     getRegion: vi.fn(async (_x: number, _y: number, w: number, h: number) => new Uint8Array(w * h).fill(7)),
     getRegionMeta: vi.fn(async () => [{ x: 1, y: 1, c: 2, n: 1, price_next: PRICE_BASE_UNITS * 2 }]),
@@ -27,10 +27,10 @@ function fakeClient(overrides: Partial<Record<keyof CanvasClient, unknown>> = {}
     remainingUnits: 10_000_000,
     spentUnits: 0,
   };
-  return { ...base, ...overrides } as unknown as CanvasClient;
+  return { ...base, ...overrides } as unknown as YearbookClient;
 }
 
-const job = { canvas: '2026', version: 1, pixels: [{ x: 1, y: 1, c: 3 }] };
+const job = { yearbook: '2026', version: 1, pixels: [{ x: 1, y: 1, c: 3 }] };
 
 describe('paint_pixels budget refusal', () => {
   it('REFUSES when the quote exceeds max_total_units, and never paints', async () => {
@@ -135,20 +135,20 @@ describe('read tools', () => {
 
 describe('server configuration', () => {
   it('refuses to start with a wallet but no budget', () => {
-    expect(() => configFromEnv({ CANVAS_WALLET_KEY: '0xabc' } as NodeJS.ProcessEnv)).toThrow(/uncapped/);
+    expect(() => configFromEnv({ YEARBOOK_WALLET_KEY: '0xabc' } as NodeJS.ProcessEnv)).toThrow(/uncapped/);
   });
 
   it('allows a read-only server with no wallet', () => {
-    const config = configFromEnv({ CANVAS_API_BASE: 'https://canvas.test' } as NodeJS.ProcessEnv);
+    const config = configFromEnv({ YEARBOOK_API_BASE: 'https://canvas.test' } as NodeJS.ProcessEnv);
     expect(config.walletKey).toBeUndefined();
     expect(config.baseUrl).toBe('https://canvas.test');
   });
 
   it('carries the budget and per-pixel ceiling through', () => {
     const config = configFromEnv({
-      CANVAS_WALLET_KEY: '0xabc',
-      CANVAS_BUDGET_UNITS: '5000000',
-      CANVAS_PER_PIXEL_MAX: '640000',
+      YEARBOOK_WALLET_KEY: '0xabc',
+      YEARBOOK_BUDGET_UNITS: '5000000',
+      YEARBOOK_PER_PIXEL_MAX: '640000',
     } as NodeJS.ProcessEnv);
     expect(config.budgetUnits).toBe(5_000_000);
     expect(config.perPixelCeilingUnits).toBe(640_000);

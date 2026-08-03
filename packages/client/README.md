@@ -1,18 +1,18 @@
-# @canvas2026/client
+# @yearbook2026/client
 
-The x402 paint client for [CANVAS 2026](https://github.com/AnmarAbdi/canvas-kit):
+The x402 paint client for [YEARBOOK 2026](https://github.com/AnmarAbdi/yearbook-kit):
 budget caps, per-tile chunking, and explicit handling of every protocol error path in
 03-PROTOCOL §6. Reading is free; writing quotes, pays, and settles over
 [x402](https://x402.org) in USDC on Base.
 
 ```ts
-import { CanvasClient } from '@canvas2026/client';
-import { viemSigner } from '@canvas2026/canvas-mcp/signer'; // or implement Signer yourself
+import { YearbookClient } from '@yearbook2026/client';
+import { viemSigner } from '@yearbook2026/yearbook-mcp/signer'; // or implement Signer yourself
 
-const client = new CanvasClient({
-  baseUrl: process.env.CANVAS_API_BASE!,
+const client = new YearbookClient({
+  baseUrl: process.env.YEARBOOK_API_BASE!,
   budget: { maxTotalUnits: 5_000_000 },        // $5.00 hard cap — mandatory to spend
-  signer: viemSigner(process.env.CANVAS_WALLET_KEY!),
+  signer: viemSigner(process.env.YEARBOOK_WALLET_KEY!),
 });
 
 const grid = await client.getRegion(0, 0, 100, 100);        // free, no signer needed
@@ -34,5 +34,5 @@ The parts that keep an agent solvent:
 - The `Signer` is injected and only ever signs an EIP-3009 transfer authorization for
   the exact amount the server quoted. Bring `viemSigner` or your own.
 
-Part of [canvas-kit](https://github.com/AnmarAbdi/canvas-kit) — contract docs live
+Part of [yearbook-kit](https://github.com/AnmarAbdi/yearbook-kit) — contract docs live
 there (`docs/03-PROTOCOL.md` is normative). MIT.

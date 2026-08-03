@@ -4,12 +4,12 @@
  * is decided here: a repair is scheduled for exactly when immunity lapses, never later.
  */
 import { describe, it, expect, vi } from 'vitest';
-import { IMMUNITY_MS, PRICE_BASE_UNITS, DiffKind, type Job } from '@canvas2026/shared';
-import { CanvasClient } from '@canvas2026/client';
+import { IMMUNITY_MS, PRICE_BASE_UNITS, DiffKind, type Job } from '@yearbook2026/shared';
+import { YearbookClient } from '@yearbook2026/client';
 import { Defender, type DefenderAlert } from './defender.js';
 
 const job: Job = {
-  canvas: '2026',
+  yearbook: '2026',
   version: 1,
   pixels: [
     { x: 10, y: 10, c: 4 },
@@ -34,7 +34,7 @@ function harness(options: { paintFails?: boolean; skipAll?: boolean } = {}) {
       painted.push(...pixels);
       return { painted: pixels, skipped: [], spentUnits: PRICE_BASE_UNITS * pixels.length, receipts: [] };
     }),
-  } as unknown as CanvasClient;
+  } as unknown as YearbookClient;
 
   const defender = new Defender({
     client,

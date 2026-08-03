@@ -13,7 +13,7 @@ Produced by the site's converter, consumed by every tool below.
 
 ```jsonc
 {
-  "canvas": "2026",
+  "yearbook": "2026",
   "version": 1,
   "name": "my-logo",                    // optional label
   "pixels": [ { "x": 120, "y": 88, "c": 7 }, ... ],
@@ -22,10 +22,10 @@ Produced by the site's converter, consumed by every tool below.
 }
 ```
 
-## 2. `canvas-mcp` (MCP server)
+## 2. `yearbook-mcp` (MCP server)
 
 Runs on the USER's machine; wraps the public HTTP API; signs payments with the
-user's wallet (env: `CANVAS_WALLET_KEY`, or a CDP/managed signer — never sent to us).
+user's wallet (env: `YEARBOOK_WALLET_KEY`, or a CDP/managed signer — never sent to us).
 x402 v2 client headers; tolerate v1 servers if `FACILITATOR`-side quirks demand.
 
 Tools:

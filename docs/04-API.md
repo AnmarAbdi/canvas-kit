@@ -8,7 +8,7 @@ free path, unrestricted for the paid path (agents call from anywhere).
 ## Reads
 
 ### `GET /api/canvas`
-Full binary snapshot. Body: wire format §W1. Headers: `X-Canvas-Seq` (global diff
+Full binary snapshot. Body: wire format §W1. Headers: `X-Yearbook-Seq` (global diff
 sequence at snapshot time), `Cache-Control: public, max-age=2`. ~250 KB at launch size.
 
 ### `GET /api/region?x=&y=&w=&h=`
@@ -59,13 +59,13 @@ a CAIP-2 id (`eip155:8453`), `extra.qid` is the quote id the payment binds to, a
 | Header | Value |
 |---|---|
 | `PAYMENT-SIGNATURE` | base64url x402 v2 `PaymentPayload` (v1 clients: `X-PAYMENT`) |
-| `X-Canvas-Quote` | the `extra.quote` token from the 402, echoed verbatim |
+| `X-Yearbook-Quote` | the `extra.quote` token from the 402, echoed verbatim |
 
 The second header exists because an EIP-3009 signature cannot cover a server blob
 (03-PROTOCOL §3). The server re-derives the payment requirements from that token and
 rejects any payload disagreeing with them on `extra.qid`, `amount`, `asset`, `payTo`,
 `network` or `scheme` — before spending a facilitator call. A missing or unparseable
-`X-Canvas-Quote` is `422 QUOTE_INVALID`.
+`X-Yearbook-Quote` is `422 QUOTE_INVALID`.
 
 ### `POST /api/free-paint`
 Body `{ x, y, c, handle?, turnstile_token }` + session cookie. One pixel per call.
@@ -121,5 +121,5 @@ meta reads 120/min; binary reads effectively uncapped (CDN). Paid writes are
 money-gated by design — no additional caps.
 
 ## Versioning
-`X-Canvas-Api: 1` on every response. Breaking changes bump the header and the
+`X-Yearbook-Api: 1` on every response. Breaking changes bump the header and the
 `version` field in job/paint bodies; the kit pins compatible versions.

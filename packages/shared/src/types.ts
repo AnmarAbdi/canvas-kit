@@ -1,5 +1,5 @@
 /**
- * Shared wire types. Shapes come from canvas-kit/docs/04-API.md (HTTP/WS contract)
+ * Shared wire types. Shapes come from yearbook-kit/docs/04-API.md (HTTP/WS contract)
  * and 03-PROTOCOL.md (quote, receipt, errors). Money: integer USDC atomic units.
  * Time: epoch ms, UTC.
  */
@@ -27,7 +27,7 @@ export interface Pixel {
 
 /** job.json v1 (07-AGENT-KIT §1). */
 export interface Job {
-  canvas: string;
+  yearbook: string;
   version: number;
   name?: string;
   pixels: Pixel[];
@@ -38,7 +38,7 @@ export interface Job {
 
 /** POST /api/paint body (04-API "Writes"). handle/url apply to every pixel in the request. */
 export interface PaintRequest {
-  canvas: string;
+  yearbook: string;
   version: number;
   pixels: Pixel[];
   handle?: string;
@@ -64,7 +64,7 @@ export interface QuotePixel extends Pixel {
 export interface Quote {
   v: 1;
   qid: string;
-  canvas: string;
+  yearbook: string;
   pixels: QuotePixel[];
   /** MUST equal accepts[0].amount. */
   total: number;

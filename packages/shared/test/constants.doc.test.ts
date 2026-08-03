@@ -103,7 +103,7 @@ describe('constants.ts matches 01-CONSTANTS.md', () => {
   it('undecided values stay null rather than being invented', () => {
     expect(docCell('LAUNCH_AT')).toContain('[DECIDE]');
     expect(C.LAUNCH_AT).toBeNull();
-    expect(C.CANVAS_DOMAIN).toBeNull();
+    expect(C.YEARBOOK_DOMAIN).toBeNull();
   });
 
   it('staging USDC address matches the doc (resolved at M3 from @x402/evm)', () => {

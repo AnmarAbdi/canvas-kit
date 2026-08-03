@@ -3,17 +3,17 @@
  * CLI wrapper around the reference defender (07-AGENT-KIT §4). Watch a job on the live
  * diff stream and repair it the moment immunity lapses. Node 22+ (global WebSocket).
  *
- *   CANVAS_WALLET_KEY=0x… npx tsx examples/defender-cli.ts job.json --budget 20.00
+ *   YEARBOOK_WALLET_KEY=0x… npx tsx examples/defender-cli.ts job.json --budget 20.00
  *
  * Its limits are the game's, not this code's (see defender.ts): it cannot beat
  * immunity — the earliest repair is one window after the attack — and it cannot outbid
  * a bigger budget, because every repaint costs more than the last.
  */
 import { readFileSync } from 'node:fs';
-import { DiffKind, PALETTE_SIZE } from '@canvas2026/shared';
-import { CanvasClient } from '@canvas2026/client';
-import { validateJob } from '@canvas2026/converter';
-import { viemSigner } from '@canvas2026/canvas-mcp/signer';
+import { DiffKind, PALETTE_SIZE } from '@yearbook2026/shared';
+import { YearbookClient } from '@yearbook2026/client';
+import { validateJob } from '@yearbook2026/converter';
+import { viemSigner } from '@yearbook2026/yearbook-mcp/signer';
 import { Defender, liveSubscription } from './defender.js';
 
 const [, , jobPath, ...rest] = process.argv;
@@ -40,14 +40,14 @@ if (!(dollars > 0)) {
   process.exit(1);
 }
 
-const key = process.env['CANVAS_WALLET_KEY'];
+const key = process.env['YEARBOOK_WALLET_KEY'];
 if (!key) {
-  console.error('CANVAS_WALLET_KEY is not set');
+  console.error('YEARBOOK_WALLET_KEY is not set');
   process.exit(1);
 }
 
-const baseUrl = process.env['CANVAS_API_BASE'] ?? 'https://canvas2026.example';
-const client = new CanvasClient({
+const baseUrl = process.env['YEARBOOK_API_BASE'] ?? 'https://yearbook2026.example';
+const client = new YearbookClient({
   baseUrl,
   budget: {
     maxTotalUnits: Math.round(dollars * 1e6),

@@ -7,9 +7,9 @@
  * be able to sign an unbounded payment, and "the model promised to be careful" is not
  * an enforcement mechanism.
  */
-import { BULK_MAX_PIXELS, CANVAS_W, CANVAS_H, PALETTE_SIZE, price, type Job, type Pixel } from '@canvas2026/shared';
-import { validateJob } from '@canvas2026/converter';
-import type { CanvasClient } from '@canvas2026/client';
+import { BULK_MAX_PIXELS, CANVAS_W, CANVAS_H, PALETTE_SIZE, price, type Job, type Pixel } from '@yearbook2026/shared';
+import { validateJob } from '@yearbook2026/converter';
+import type { YearbookClient } from '@yearbook2026/client';
 
 export interface ToolResult {
   ok: boolean;
@@ -30,7 +30,7 @@ function badPixels(pixels: unknown): string | null {
 }
 
 export async function getRegion(
-  client: CanvasClient,
+  client: YearbookClient,
   args: { x: number; y: number; w: number; h: number; meta?: boolean },
 ): Promise<ToolResult> {
   if (args.w <= 0 || args.h <= 0) return { ok: false, summary: 'w and h must be positive' };
@@ -48,7 +48,7 @@ export async function getRegion(
   };
 }
 
-export async function quote(client: CanvasClient, args: { pixels?: Pixel[]; job?: unknown }): Promise<ToolResult> {
+export async function quote(client: YearbookClient, args: { pixels?: Pixel[]; job?: unknown }): Promise<ToolResult> {
   const pixels = args.job ? jobPixels(args.job) : args.pixels;
   if (!pixels) return { ok: false, summary: 'pass either pixels[] or a job' };
   const invalid = badPixels(pixels);
@@ -62,7 +62,7 @@ export async function quote(client: CanvasClient, args: { pixels?: Pixel[]; job?
   };
 }
 
-export async function diffJob(client: CanvasClient, args: { job: unknown }): Promise<ToolResult> {
+export async function diffJob(client: YearbookClient, args: { job: unknown }): Promise<ToolResult> {
   const validated = validateJob(args.job);
   if (!validated.ok) return { ok: false, summary: `invalid job: ${validated.reason}` };
 
@@ -78,7 +78,7 @@ export async function diffJob(client: CanvasClient, args: { job: unknown }): Pro
 }
 
 export async function paintPixels(
-  client: CanvasClient,
+  client: YearbookClient,
   args: { pixels: Pixel[]; max_total_units: number; handle?: string; url?: string },
 ): Promise<ToolResult> {
   const invalid = badPixels(args.pixels);
@@ -129,7 +129,7 @@ export async function paintPixels(
   };
 }
 
-export async function getStats(client: CanvasClient, baseUrl: string, fetchImpl = fetch): Promise<ToolResult> {
+export async function getStats(client: YearbookClient, baseUrl: string, fetchImpl = fetch): Promise<ToolResult> {
   void client;
   const res = await fetchImpl(`${baseUrl}/api/stats`);
   if (!res.ok) return { ok: false, summary: `/api/stats ${res.status}` };

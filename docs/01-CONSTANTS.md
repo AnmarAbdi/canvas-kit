@@ -6,7 +6,7 @@ which is generated from this file and reviewed by a human on every change. Chang
 value is a one-line PR here + regeneration; "patch notes" are published content.
 
 Server-internal tunables (tile size, cache TTLs, rate limits) live in
-`canvas-server/docs/05-ARCHITECTURE.md` — they are not game rules.
+`yearbook-server/docs/05-ARCHITECTURE.md` — they are not game rules.
 
 ## Canvas
 
@@ -25,7 +25,7 @@ Server-internal tunables (tile size, cache TTLs, rate limits) live in
 | `PLATEAU_UNITS` | 10_240_000 | = $10.24, reached at n=10. Every repaint at n≥10 costs exactly this. |
 | `BULK_MAX_PIXELS` | 1_000 | Per paint request, priced per pixel individually. |
 
-Moderation repaints do NOT increment `n` (see canvas-server/docs/08-MODERATION.md).
+Moderation repaints do NOT increment `n` (see yearbook-server/docs/08-MODERATION.md).
 
 ## Immunity
 

@@ -4,7 +4,7 @@
  * thought were transparent — because they only find out after paying for it.
  */
 import { describe, it, expect } from 'vitest';
-import { PALETTE, PALETTE_SIZE, CANVAS_W, CANVAS_H, requireColorHex } from '@canvas2026/shared';
+import { PALETTE, PALETTE_SIZE, CANVAS_W, CANVAS_H, requireColorHex } from '@yearbook2026/shared';
 import { snapToPalette, toJob, validateJob, nearestIndex, type Rgba } from '../src/index.js';
 
 function image(pixels: [number, number, number, number][], width: number): Rgba {
@@ -146,7 +146,7 @@ describe('job.json', () => {
     const img = image([[...black, 255]] as [number, number, number, number][], 1);
     const job = toJob(img, { x: 1, y: 2, name: 'logo', estCostUnits: 4_120_000 });
 
-    expect(job.canvas).toBe('2026');
+    expect(job.yearbook).toBe('2026');
     expect(job.version).toBe(1);
     expect(job.name).toBe('logo');
     expect(job.est_cost_units).toBe(4_120_000);
@@ -162,14 +162,14 @@ describe('job.json', () => {
 });
 
 describe('validateJob', () => {
-  const base = { canvas: '2026', version: 1, pixels: [{ x: 1, y: 1, c: 1 }] };
+  const base = { yearbook: '2026', version: 1, pixels: [{ x: 1, y: 1, c: 1 }] };
 
   it('accepts a good job', () => {
     expect(validateJob(base).ok).toBe(true);
   });
 
   it('rejects everything that would cost money to discover on the server', () => {
-    expect(validateJob({ ...base, canvas: '2025' })).toMatchObject({ ok: false });
+    expect(validateJob({ ...base, yearbook: '2025' })).toMatchObject({ ok: false });
     expect(validateJob({ ...base, version: 2 })).toMatchObject({ ok: false });
     expect(validateJob({ ...base, pixels: [] })).toMatchObject({ ok: false });
     expect(validateJob({ ...base, pixels: [{ x: -1, y: 0, c: 0 }] })).toMatchObject({ ok: false });

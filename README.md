@@ -1,6 +1,6 @@
-# canvas-kit
+# yearbook-kit
 
-Open-source half of **CANVAS 2026**: one shared pixel canvas for the year 2026.
+Open-source half of **YEARBOOK 2026**: one shared pixel canvas for the year 2026.
 Humans paint free in the browser. Robots pay per pixel over [x402](https://x402.org).
 At midnight UTC as 2026 ends, the canvas freezes forever.
 
@@ -13,7 +13,7 @@ packages/
   shared/      game rules, wire types, W1/W2 codecs (generated from 01-CONSTANTS)
   converter/   image → job.json
   client/      the paint client: budget caps, chunking, protocol error handling
-  canvas-mcp/  MCP server — hand this to Claude and it can paint
+  yearbook-mcp/  MCP server — hand this to Claude and it can paint
 examples/      reference painter (TS + Python) and the open-source defender
 ```
 
@@ -53,8 +53,8 @@ node -e "const {generatePrivateKey,privateKeyToAccount}=require('viem/accounts')
 authorization for the exact amount the server quoted, and nothing else. We never see it.
 
 ```bash
-export CANVAS_WALLET_KEY=0x...
-export CANVAS_API_BASE=https://…          # the canvas you are painting
+export YEARBOOK_WALLET_KEY=0x...
+export YEARBOOK_API_BASE=https://…          # the canvas you are painting
 ```
 
 **4. Set a budget. This is not optional.** Every tool here refuses to paint without a
@@ -65,8 +65,8 @@ cap, because an agent that can sign unbounded payments is a liability, not a fea
 Everything below runs out of a fresh clone (Node 22+):
 
 ```bash
-git clone git@github.com:AnmarAbdi/canvas-kit.git
-cd canvas-kit
+git clone git@github.com:AnmarAbdi/yearbook-kit.git
+cd yearbook-kit
 npm install
 npm run build     # builds the four packages; the TS examples run via tsx
 ```
@@ -76,41 +76,41 @@ npm run build     # builds the four packages; the TS examples run via tsx
 ```jsonc
 // claude_desktop_config.json → mcpServers
 {
-  "canvas": {
+  "yearbook": {
     "command": "node",
-    "args": ["/absolute/path/to/canvas-kit/packages/canvas-mcp/dist/bin.js"],
+    "args": ["/absolute/path/to/yearbook-kit/packages/yearbook-mcp/dist/bin.js"],
     "env": {
-      "CANVAS_API_BASE": "https://…",
-      "CANVAS_WALLET_KEY": "0x…",
-      "CANVAS_BUDGET_UNITS": "5000000",   // $5.00, atomic USDC units (6 decimals)
-      "CANVAS_PER_PIXEL_MAX": "640000"    // optional: skip pixels above $0.64
+      "YEARBOOK_API_BASE": "https://…",
+      "YEARBOOK_WALLET_KEY": "0x…",
+      "YEARBOOK_BUDGET_UNITS": "5000000",   // $5.00, atomic USDC units (6 decimals)
+      "YEARBOOK_PER_PIXEL_MAX": "640000"    // optional: skip pixels above $0.64
     }
   }
 }
 ```
 
-Once the package is on npm, `"command": "npx", "args": ["-y", "@canvas2026/canvas-mcp"]`
+Once the package is on npm, `"command": "npx", "args": ["-y", "@yearbook2026/yearbook-mcp"]`
 does the same thing without the clone.
 
 Tools: `get_region`, `quote`, `diff_job`, `paint_pixels`, `get_stats`. Omit
-`CANVAS_WALLET_KEY` for a read-only server that can look but not spend.
+`YEARBOOK_WALLET_KEY` for a read-only server that can look but not spend.
 
 ### Or run the painter
 
 ```bash
 # 1. make a job.json from an image (or use the converter on the site)
 # 2. paint it, with a hard cap in dollars
-CANVAS_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle you
+YEARBOOK_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle you
 
 # same thing in Python
 pip install requests eth-account
-CANVAS_WALLET_KEY=0x… python examples/painter.py job.json --budget 5.00
+YEARBOOK_WALLET_KEY=0x… python examples/painter.py job.json --budget 5.00
 ```
 
 ### Or defend what you painted
 
 ```bash
-CANVAS_WALLET_KEY=0x… npx tsx examples/defender-cli.ts job.json --budget 20.00
+YEARBOOK_WALLET_KEY=0x… npx tsx examples/defender-cli.ts job.json --budget 20.00
 ```
 
 The defender watches the live diff stream and repairs your pixels the moment their

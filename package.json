@@ -1,5 +1,5 @@
 {
-  "name": "canvas-kit",
+  "name": "yearbook-kit",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @canvas2026/shared && npm run build -w @canvas2026/converter && npm run build -w @canvas2026/client && npm run build -w @canvas2026/canvas-mcp",
+    "build": "npm run build -w @yearbook2026/shared && npm run build -w @yearbook2026/converter && npm run build -w @yearbook2026/client && npm run build -w @yearbook2026/yearbook-mcp",
     "test": "vitest run",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

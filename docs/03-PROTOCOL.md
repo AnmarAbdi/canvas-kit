@@ -13,7 +13,7 @@ Design invariants inherited from 00-SPEC:
 ## 1. Roles
 
 - **Client**: any x402-capable caller (agent loop, MCP server, script, browser wallet).
-- **Server**: Cloudflare Worker + per-tile Durable Objects (see canvas-server docs).
+- **Server**: Cloudflare Worker + per-tile Durable Objects (see yearbook-server docs).
 - **Facilitator**: verifies payment payloads (`POST /verify`) and submits settlement
   (`POST /settle`). Holds no funds. URL is config (`FACILITATOR_URL`).
 
@@ -58,7 +58,7 @@ server secret, rotatable):
 {
   "v": 1,
   "qid": "ulid",                 // unique quote id
-  "canvas": "2026",
+  "yearbook": "2026",
   "pixels": [{ "x": 0, "y": 0, "c": 7, "n": 3, "p": 80000 }, ...],
   // n = expected repaint index at commit time; p = price units for THIS repaint
   "total": 1234000,              // MUST equal accepts[0].amount (v2) — atomic USDC units
@@ -83,7 +83,7 @@ Rules:
   exactly `(from, to, value, validAfter, validBefore, nonce)` — there is nowhere in it
   to sign over a server blob. So the quote is bound to the payment on the server side,
   not inside the signature:
-  - the client echoes the quote token back in the `X-Canvas-Quote` header (04-API);
+  - the client echoes the quote token back in the `X-Yearbook-Quote` header (04-API);
   - the server rebuilds `PaymentRequirements` **from its own signed quote** and sends
     those to `/verify` and `/settle` — never the client's copy;
   - the server MUST reject, before calling the facilitator, any payload whose
@@ -246,5 +246,5 @@ same tile-DO CAS minus payment. Owner recorded as `anon-session` + optional hand
 
 ## 10. Out of scope here
 
-Wire formats and endpoint shapes → 04-API. Storage schema → canvas-server/02-DATA.
-Moderation state machine → canvas-server/08-MODERATION.
+Wire formats and endpoint shapes → 04-API. Storage schema → yearbook-server/02-DATA.
+Moderation state machine → yearbook-server/08-MODERATION.

@@ -11,7 +11,7 @@
  * on photographic input. Full CIELAB would be better still and is not worth the size
  * here — the palette is 32 colours, not 32,000.
  */
-import { PALETTE_SIZE, CANVAS_W, CANVAS_H, requireColorHex, BLANK_COLOR_INDEX, type Job, type Pixel } from '@canvas2026/shared';
+import { PALETTE_SIZE, CANVAS_W, CANVAS_H, requireColorHex, BLANK_COLOR_INDEX, type Job, type Pixel } from '@yearbook2026/shared';
 
 export interface Rgba {
   data: Uint8ClampedArray | Uint8Array;
@@ -185,7 +185,7 @@ export function toJob(image: Rgba, options: JobOptions): Job {
   }
 
   return {
-    canvas: '2026',
+    yearbook: '2026',
     version: 1,
     ...(options.name ? { name: options.name } : {}),
     pixels,
@@ -199,7 +199,7 @@ export function toJob(image: Rgba, options: JobOptions): Job {
 export function validateJob(job: unknown): { ok: true; job: Job } | { ok: false; reason: string } {
   if (typeof job !== 'object' || job === null) return { ok: false, reason: 'not an object' };
   const j = job as Record<string, unknown>;
-  if (j['canvas'] !== '2026') return { ok: false, reason: 'canvas must be "2026"' };
+  if (j['yearbook'] !== '2026') return { ok: false, reason: 'yearbook must be "2026"' };
   if (j['version'] !== 1) return { ok: false, reason: 'version must be 1' };
   if (!Array.isArray(j['pixels']) || j['pixels'].length === 0) return { ok: false, reason: 'pixels must be a non-empty array' };
 

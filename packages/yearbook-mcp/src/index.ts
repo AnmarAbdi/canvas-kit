@@ -1,17 +1,17 @@
 /**
- * canvas-mcp — runs on the USER's machine, wraps the public HTTP API, signs with the
+ * yearbook-mcp — runs on the USER's machine, wraps the public HTTP API, signs with the
  * user's wallet. We never see a key (07-AGENT-KIT §2).
  *
  * Env:
- *   CANVAS_API_BASE        https://… (defaults to the public canvas)
- *   CANVAS_WALLET_KEY      0x… private key, or omit for a read-only server
- *   CANVAS_BUDGET_UNITS    hard ceiling for the whole session, atomic USDC units
- *   CANVAS_PER_PIXEL_MAX   optional per-pixel ceiling
+ *   YEARBOOK_API_BASE        https://… (defaults to the public canvas)
+ *   YEARBOOK_WALLET_KEY      0x… private key, or omit for a read-only server
+ *   YEARBOOK_BUDGET_UNITS    hard ceiling for the whole session, atomic USDC units
+ *   YEARBOOK_PER_PIXEL_MAX   optional per-pixel ceiling
  */
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { CanvasClient } from '@canvas2026/client';
+import { YearbookClient } from '@yearbook2026/client';
 import { getRegion, quote, diffJob, paintPixels, getStats, type ToolResult } from './tools.js';
 import { viemSigner } from './signer.js';
 
@@ -23,21 +23,21 @@ export interface ServerConfig {
 }
 
 export function configFromEnv(env: NodeJS.ProcessEnv = process.env): ServerConfig {
-  const budget = Number(env['CANVAS_BUDGET_UNITS'] ?? 0);
-  if (env['CANVAS_WALLET_KEY'] && !(budget > 0)) {
+  const budget = Number(env['YEARBOOK_BUDGET_UNITS'] ?? 0);
+  if (env['YEARBOOK_WALLET_KEY'] && !(budget > 0)) {
     // A wallet with no ceiling is the one configuration we refuse to start with.
-    throw new Error('CANVAS_WALLET_KEY is set but CANVAS_BUDGET_UNITS is not — refusing to run an uncapped painter');
+    throw new Error('YEARBOOK_WALLET_KEY is set but YEARBOOK_BUDGET_UNITS is not — refusing to run an uncapped painter');
   }
   return {
-    baseUrl: env['CANVAS_API_BASE'] ?? 'https://canvas2026.example',
-    ...(env['CANVAS_WALLET_KEY'] ? { walletKey: env['CANVAS_WALLET_KEY'] } : {}),
+    baseUrl: env['YEARBOOK_API_BASE'] ?? 'https://yearbook2026.example',
+    ...(env['YEARBOOK_WALLET_KEY'] ? { walletKey: env['YEARBOOK_WALLET_KEY'] } : {}),
     budgetUnits: budget,
-    ...(env['CANVAS_PER_PIXEL_MAX'] ? { perPixelCeilingUnits: Number(env['CANVAS_PER_PIXEL_MAX']) } : {}),
+    ...(env['YEARBOOK_PER_PIXEL_MAX'] ? { perPixelCeilingUnits: Number(env['YEARBOOK_PER_PIXEL_MAX']) } : {}),
   };
 }
 
-export function createClient(config: ServerConfig): CanvasClient {
-  return new CanvasClient({
+export function createClient(config: ServerConfig): YearbookClient {
+  return new YearbookClient({
     baseUrl: config.baseUrl,
     budget: {
       maxTotalUnits: config.budgetUnits,
@@ -57,7 +57,7 @@ const asContent = (result: ToolResult) => ({
 
 export function createServer(config: ServerConfig): McpServer {
   const client = createClient(config);
-  const server = new McpServer({ name: 'canvas-mcp', version: '0.1.0' });
+  const server = new McpServer({ name: 'yearbook-mcp', version: '0.1.0' });
 
   server.registerTool(
     'get_region',

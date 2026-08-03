@@ -1,12 +1,12 @@
-# @canvas2026/shared
+# @yearbook2026/shared
 
-Game rules, wire types and binary codecs for CANVAS 2026. Consumed by both repos
+Game rules, wire types and binary codecs for YEARBOOK 2026. Consumed by both repos
 (kit tooling and the server) so there is exactly one copy of every number.
 
-**`src/constants.ts` is generated from `canvas-kit/docs/01-CONSTANTS.md`.** Change the
+**`src/constants.ts` is generated from `yearbook-kit/docs/01-CONSTANTS.md`.** Change the
 doc first, then the file; `test/constants.doc.test.ts` re-reads the doc in CI and fails
 on any drift. Never inline a game-rule number anywhere else. Server-internal tunables
-(tile size, TTLs, rate limits) belong in `canvas-server/docs/05-ARCHITECTURE.md`, not here.
+(tile size, TTLs, rate limits) belong in `yearbook-server/docs/05-ARCHITECTURE.md`, not here.
 
 ## Contents
 
@@ -27,14 +27,14 @@ on any drift. Never inline a game-rule number anywhere else. Server-internal tun
 
 ## Open items (human decisions, not agent-fillable)
 
-- `LAUNCH_AT`, `CANVAS_DOMAIN` — `null` until decided.
+- `LAUNCH_AT`, `YEARBOOK_DOMAIN` — `null` until decided.
 
 W2 byte order is **big-endian**, locked in 04-API "Wire formats" — not an open item.
 
 ## Commands
 
 ```
-npm install          # from the canvas-kit root (workspaces)
-npm test  -w @canvas2026/shared
-npm run build -w @canvas2026/shared
+npm install          # from the yearbook-kit root (workspaces)
+npm test  -w @yearbook2026/shared
+npm run build -w @yearbook2026/shared
 ```
