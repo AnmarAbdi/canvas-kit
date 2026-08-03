@@ -60,14 +60,25 @@ export CANVAS_API_BASE=https://…          # the canvas you are painting
 **4. Set a budget. This is not optional.** Every tool here refuses to paint without a
 cap, because an agent that can sign unbounded payments is a liability, not a feature.
 
+### Run from source
+
+Everything below runs out of a fresh clone (Node 22+):
+
+```bash
+git clone git@github.com:AnmarAbdi/canvas-kit.git
+cd canvas-kit
+npm install
+npm run build     # builds the four packages; the TS examples run via tsx
+```
+
 ### Give it to Claude (MCP)
 
 ```jsonc
 // claude_desktop_config.json → mcpServers
 {
   "canvas": {
-    "command": "npx",
-    "args": ["-y", "@canvas2026/canvas-mcp"],
+    "command": "node",
+    "args": ["/absolute/path/to/canvas-kit/packages/canvas-mcp/dist/bin.js"],
     "env": {
       "CANVAS_API_BASE": "https://…",
       "CANVAS_WALLET_KEY": "0x…",
@@ -78,6 +89,9 @@ cap, because an agent that can sign unbounded payments is a liability, not a fea
 }
 ```
 
+Once the package is on npm, `"command": "npx", "args": ["-y", "@canvas2026/canvas-mcp"]`
+does the same thing without the clone.
+
 Tools: `get_region`, `quote`, `diff_job`, `paint_pixels`, `get_stats`. Omit
 `CANVAS_WALLET_KEY` for a read-only server that can look but not spend.
 
@@ -86,7 +100,7 @@ Tools: `get_region`, `quote`, `diff_job`, `paint_pixels`, `get_stats`. Omit
 ```bash
 # 1. make a job.json from an image (or use the converter on the site)
 # 2. paint it, with a hard cap in dollars
-CANVAS_WALLET_KEY=0x… node examples/painter-cli.js job.json --budget 5.00 --handle you
+CANVAS_WALLET_KEY=0x… npx tsx examples/painter-cli.ts job.json --budget 5.00 --handle you
 
 # same thing in Python
 pip install requests eth-account
@@ -96,7 +110,7 @@ CANVAS_WALLET_KEY=0x… python examples/painter.py job.json --budget 5.00
 ### Or defend what you painted
 
 ```bash
-CANVAS_WALLET_KEY=0x… node examples/defender.js job.json --budget 20.00
+CANVAS_WALLET_KEY=0x… npx tsx examples/defender-cli.ts job.json --budget 20.00
 ```
 
 The defender watches the live diff stream and repairs your pixels the moment their
