@@ -1,5 +1,14 @@
 node_modules/
 dist/
+examples-dist/
 .DS_Store
 __pycache__/
 *.pyc
+
+# never commit credentials — keys live in the environment (see README)
+.env
+.env.*
+.dev.vars
+*.key
+*.pem
+.npmrc
