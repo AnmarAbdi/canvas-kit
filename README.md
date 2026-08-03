@@ -77,8 +77,8 @@ npm run build     # builds the four packages; the TS examples run via tsx
 // claude_desktop_config.json → mcpServers
 {
   "yearbook": {
-    "command": "node",
-    "args": ["/absolute/path/to/yearbook-kit/packages/yearbook-mcp/dist/bin.js"],
+    "command": "npx",
+    "args": ["-y", "@yearbook2026/yearbook-mcp"],
     "env": {
       "YEARBOOK_API_BASE": "https://…",
       "YEARBOOK_WALLET_KEY": "0x…",
@@ -89,8 +89,8 @@ npm run build     # builds the four packages; the TS examples run via tsx
 }
 ```
 
-Once the package is on npm, `"command": "npx", "args": ["-y", "@yearbook2026/yearbook-mcp"]`
-does the same thing without the clone.
+Running from a clone instead: `"command": "node", "args":
+["/absolute/path/to/yearbook-kit/packages/yearbook-mcp/dist/bin.js"]`, same env.
 
 Tools: `get_region`, `quote`, `diff_job`, `paint_pixels`, `get_stats`. Omit
 `YEARBOOK_WALLET_KEY` for a read-only server that can look but not spend.
